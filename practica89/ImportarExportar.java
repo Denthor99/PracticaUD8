@@ -1,4 +1,4 @@
-package practica89;
+package org.ieslosremedios.daw1.prog.ut8y9;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -18,7 +18,7 @@ public class ImportarExportar {
     private static String NOMBRE_TABLA;
     private static String RUTA;
 
-
+/*
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int opcion;
@@ -70,7 +70,7 @@ public class ImportarExportar {
         RUTA = scanner.nextLine();
         scanner.close();
     }
-
+*/
     static void importarXML(String nombreBD, String nombreTabla, String ruta) {
         try {
             Connection con = DriverManager.getConnection(DB_URL + nombreBD, DB_USER, DB_PASSWORD);

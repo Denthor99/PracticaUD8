@@ -1,4 +1,4 @@
-package practica89;
+package org.ieslosremedios.daw1.prog.ut8y9;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,9 +11,6 @@ public class Operaciones {
     private static final String DB_PASSWORD = "";
     private static final String DRIVER = "org.mariadb.jdbc.Driver";
 
-    public static void main(String[] args) {
-
-    }
 
     static String alumnoMasParticipativo(String nombreBD, String nombreTabla) {
 
@@ -181,7 +178,9 @@ public class Operaciones {
         return alumnosSeleccionados;
     }
 
-    static void alumnoUltimo() {
+    static List<String> alumnoUltimo(String nombreBD, String nombreTabla) {
+        List<String> alumnosSeleccionados = new ArrayList<>();
+
         try {
             // Enlazar con el driver
             Class.forName(DRIVER);
@@ -189,13 +188,13 @@ public class Operaciones {
             Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
             Statement stm = con.createStatement();
 
-            ResultSet rs = stm.executeQuery("SELECT ultima_intervencion FROM instituto.daw1 WHERE ultima_intervencion IS NOT NULL ORDER BY ultima_intervencion DESC LIMIT 1");
+            ResultSet rs = stm.executeQuery("SELECT ultima_intervencion FROM " + nombreBD + "." + nombreTabla + " ORDER BY ultima_intervencion DESC LIMIT 1");
 
             if (rs.next()) {
                 Date ultimaIntervencion = rs.getDate("ultima_intervencion");
                 ArrayList<String> alumnos = new ArrayList<>();
 
-                rs = stm.executeQuery("SELECT alumno FROM instituto.daw1 WHERE ultima_intervencion = '" + ultimaIntervencion + "'");
+                rs = stm.executeQuery("SELECT alumno FROM " + nombreBD + "." + nombreTabla + " WHERE ultima_intervencion = '" + ultimaIntervencion + "'");
 
                 while (rs.next()) {
                     String alumno = rs.getString("alumno");
@@ -207,16 +206,16 @@ public class Operaciones {
                         Random random = new Random();
                         int indiceAleatorio = random.nextInt(alumnos.size());
                         String alumnoSeleccionado = alumnos.get(indiceAleatorio);
-                        System.out.println("Alumno seleccionado: " + alumnoSeleccionado);
+                        alumnosSeleccionados.add("Alumno seleccionado: " + alumnoSeleccionado);
                     } else {
                         String alumnoSeleccionado = alumnos.get(0);
-                        System.out.println("Alumno seleccionado: " + alumnoSeleccionado);
+                        alumnosSeleccionados.add("Alumno seleccionado: " + alumnoSeleccionado);
                     }
                 } else {
-                    System.out.println("No hay alumnos con la misma fecha de intervención");
+                    alumnosSeleccionados.add("No hay alumnos con la misma fecha de intervención");
                 }
             } else {
-                System.out.println("No hay alumnos con intervenciones");
+                alumnosSeleccionados.add("No hay alumnos con intervenciones");
             }
 
             stm.close();
@@ -225,10 +224,17 @@ public class Operaciones {
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Ha fallado la conexión: " + e.getMessage());
         }
+
+        return alumnosSeleccionados;
     }
 
-    static void alumnoInfo() {
+
+
+
+    static List<String> alumnoInfo(String nombreBD, String nombreTabla, String alumno) {
         String url = "jdbc:mariadb://localhost:3306/instituto";
+        List<String> infoAlumno = new ArrayList<>();
+
         try {
             // Enlazar con el driver
             Class.forName(DRIVER);
@@ -237,16 +243,37 @@ public class Operaciones {
             Statement stm = con.createStatement();
 
             // Mostrar la información de un alumno dado
+            String query = "SELECT * FROM " + nombreBD + "." + nombreTabla + " WHERE alumno = '" + alumno + "';";
+            ResultSet rs = stm.executeQuery(query);
+
+            while (rs.next()) {
+                String nombre = rs.getString("alumno");
+                int intervenciones = rs.getInt("intervenciones");
+                String fecha=rs.getString("ultima_intervencion");
+                // ... Obtener los demás campos que deseas mostrar
+
+                // Agregar la información del alumno a la lista
+                infoAlumno.add("Nombre: " + nombre);
+                infoAlumno.add("Intervenciones actuales: " + intervenciones);
+                infoAlumno.add("Ultima Intervención: " + fecha);
+
+            }
 
             stm.close();
             con.close();
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Ha fallado la conexión: " + e.getMessage());
         }
+
+        return infoAlumno;
     }
 
-    static void alumnoDarAlta() {
-        String url = "jdbc:mariadb://localhost:3306/instituto";
+
+
+
+    public static String alumnoDarAlta(String nombreBD, String nombreTabla, String alumno) {
+        String resultado = "";
+
         try {
             // Enlazar con el driver
             Class.forName(DRIVER);
@@ -254,68 +281,166 @@ public class Operaciones {
             Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
             Statement stm = con.createStatement();
 
-            // Dar de alta, baja y modificar alumnos
+            String query = "INSERT INTO " + nombreBD + "." + nombreTabla + " (alumno, ultima_intervencion) VALUES (?, ?)";
 
-            stm.close();
-            con.close();
-        } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Ha fallado la conexión: " + e.getMessage());
-        }
-    }
-
-    static void alumnoDarBaja() {
-        String url = "jdbc:mariadb://localhost:3306/instituto";
-        try {
-            // Enlazar con el driver
-            Class.forName(DRIVER);
-
-            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            Statement stm = con.createStatement();
-
-            // Dar de alta, baja y modificar alumnos
-
-            stm.close();
-            con.close();
-        } catch (SQLException | ClassNotFoundException e) {
-            System.err.println("Ha fallado la conexión: " + e.getMessage());
-        }
-    }
-
-    static void alumnoModificar(String nombreBD, String nombreTabla, String alumno, String nuevoNombre, Integer nuevasIntervenciones) {
-        try (Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            con.setAutoCommit(false);
-            if (nuevasIntervenciones > 0) {
-                try (PreparedStatement pstmt = con.prepareStatement("UPDATE " + nombreBD + "." + nombreTabla + " SET alumno = ?, intervenciones = ?, ultima_intervencion = NOW() WHERE alumno = ?")) {
-                    pstmt.setString(1, nuevoNombre);
-                    pstmt.setInt(2, nuevasIntervenciones);
-                    pstmt.setString(3, alumno);
-                    int filasActualizadas = pstmt.executeUpdate();
-                    if (filasActualizadas > 0) {
-                        con.commit();
-                        System.out.println("El alumno " + alumno + " ha sido modificado correctamente");
-                    } else {
-                        con.rollback();
-                        System.out.println("No se encontró ningún alumno con el nombre " + alumno);
-                    }
-                }
-            } else {
-                try (PreparedStatement pstmt = con.prepareStatement("UPDATE " + nombreBD + "." + nombreTabla + " SET alumno = ?, intervenciones = ?, ultima_intervencion = NULL WHERE alumno = ?")) {
-                    pstmt.setString(1, nuevoNombre);
-                    pstmt.setInt(2, nuevasIntervenciones);
-                    pstmt.setString(3, alumno);
-                    int filasActualizadas = pstmt.executeUpdate();
-                    if (filasActualizadas > 0) {
-                        con.commit();
-                        System.out.println("El alumno " + alumno + " ha sido modificado correctamente");
-                    } else {
-                        con.rollback();
-                        System.out.println("No se encontró ningún alumno con el nombre " + alumno);
-                    }
+            try (PreparedStatement pstmt = con.prepareStatement(query)) {
+                pstmt.setString(1, alumno);
+                pstmt.setString(2,"0000-00-00");
+                int filasInsertadas = pstmt.executeUpdate();
+                if (filasInsertadas > 0) {
+                    resultado = "El alumno " + alumno + " ha sido dado de alta correctamente";
+                } else {
+                    resultado = "No se pudo dar de alta al alumno " + alumno;
                 }
             }
-            con.setAutoCommit(true);
-        } catch (SQLException e) {
+
+            stm.close();
+            con.close();
+
+        } catch (SQLException | ClassNotFoundException e) {
             System.err.println("Ha fallado la conexión: " + e.getMessage());
         }
+
+        return resultado;
+    }
+
+
+    public static String alumnoDarBaja(String nombreBD, String nombreTabla, String alumno) {
+        String resultado = "";
+
+        try {
+            // Enlazar con el driver
+            Class.forName(DRIVER);
+
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            Statement stm = con.createStatement();
+
+            String query = "DELETE FROM " + nombreBD + "." + nombreTabla + " WHERE alumno = ?";
+
+            try (PreparedStatement pstmt = con.prepareStatement(query)) {
+                pstmt.setString(1, alumno);
+                int filasEliminadas = pstmt.executeUpdate();
+                if (filasEliminadas > 0) {
+                    resultado = "El alumno " + alumno + " ha sido dado de baja correctamente";
+                } else {
+                    resultado = "No se encontró ningún alumno con el nombre " + alumno;
+                }
+            }
+
+            stm.close();
+            con.close();
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Ha fallado la conexión: " + e.getMessage());
+        }
+
+        return resultado;
+    }
+
+
+    public static List<String> alumnoModificar(String nombreBD, String nombreTabla, String alumno, String nuevoNombre, Integer nuevasIntervenciones) {
+        List<String> resultados = new ArrayList<>();
+
+        try {
+            // Enlazar con el driver
+            Class.forName(DRIVER);
+
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            con.setAutoCommit(false);
+
+            String query;
+            if (nuevasIntervenciones > 0) {
+                query = "UPDATE " + nombreBD + "." + nombreTabla + " SET alumno = ?, intervenciones = ?, ultima_intervencion = NOW() WHERE alumno = ?";
+            } else {
+                query = "UPDATE " + nombreBD + "." + nombreTabla + " SET alumno = ?, intervenciones = ?, ultima_intervencion = NULL WHERE alumno = ?";
+            }
+
+            try (PreparedStatement pstmt = con.prepareStatement(query)) {
+                pstmt.setString(1, nuevoNombre);
+                pstmt.setInt(2, nuevasIntervenciones);
+                pstmt.setString(3, alumno);
+                int filasActualizadas = pstmt.executeUpdate();
+                if (filasActualizadas > 0) {
+                    con.commit();
+                    resultados.add("El alumno " + alumno + " ha sido modificado correctamente");
+                    resultados.add("Nuevo nombre: " + nuevoNombre);
+                    resultados.add("Nuevas intervenciones: " + nuevasIntervenciones);
+                } else {
+                    con.rollback();
+                    resultados.add("No se encontró ningún alumno con el nombre " + alumno);
+                }
+            }
+
+            con.setAutoCommit(true);
+            con.close();
+
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("Ha fallado la conexión: " + e.getMessage());
+        }
+
+        return resultados;
+    }
+    // Metodos tema anterior
+
+    // Elegir alumno de forma aleatoria
+    public static String seleccionarAlumnoAleatorio(String nombreBD, String nombreTabla) {
+        String resultado = "";
+
+        try {
+            // Enlazar con el driver
+            Class.forName(DRIVER);
+
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            Statement stm = con.createStatement();
+
+            String query = "SELECT alumno FROM " + nombreBD + "." + nombreTabla;
+            ResultSet rs = stm.executeQuery(query);
+            ArrayList<String> alumnos = new ArrayList<>();
+
+            while (rs.next()) {
+                String alumno = rs.getString("alumno");
+                alumnos.add(alumno);
+            }
+
+            if (alumnos.isEmpty()) {
+                resultado = "No hay alumnos en la base de datos.";
+            } else {
+                Random random = new Random();
+                int indiceAleatorio = random.nextInt(alumnos.size());
+                String alumnoSeleccionado = alumnos.get(indiceAleatorio);
+                resultado = "Alumno seleccionado: " + alumnoSeleccionado;
+            }
+
+            stm.close();
+            con.close();
+
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return resultado;
+    }
+    // Poner intervenciones a cero
+    public static String reiniciarIntervenciones(String nombreBD, String nombreTabla) {
+        String reinicioIntervenciones="";
+        try {
+            // Enlazar con el driver
+            Class.forName(DRIVER);
+
+            Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+            Statement stm = con.createStatement();
+
+            String updateQuery = "UPDATE " + nombreBD + "." + nombreTabla + " SET intervenciones = 0, ultima_intervencion = '0000-00-00'";
+            int filasActualizadas = stm.executeUpdate(updateQuery);
+
+            String reinicio="Se han reiniciado las intervenciones en " + filasActualizadas + " filas.";
+
+            stm.close();
+            con.close();
+
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return reinicioIntervenciones;
     }
 }

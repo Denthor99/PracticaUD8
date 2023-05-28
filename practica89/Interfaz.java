@@ -1,4 +1,4 @@
-package practica89;
+package org.ieslosremedios.daw1.prog.ut8y9;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -6,9 +6,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import static practica89.BaseDatos.*;
-import static practica89.ImportarExportar.*;
-import static practica89.Operaciones.*;
+import static org.ieslosremedios.daw1.prog.ut8y9.BaseDatos.*;
+import static org.ieslosremedios.daw1.prog.ut8y9.Operaciones.*;
+import static org.ieslosremedios.daw1.prog.ut8y9.ImportarExportar.*;
 
 
 public class Interfaz extends Frame {
@@ -73,6 +73,15 @@ public class Interfaz extends Frame {
         crearBorrarFrame = crearBorrar();
         operacionesFrame = operaciones();
         importarExportarFrame = importarExportar();
+
+        // Con esto cerramos el menú principal (paramos la ejecución)
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                dispose();
+                System.exit(0); // Si no se cierra, usamos la fuerza bruta
+            }
+        });
     }
 
 
@@ -94,7 +103,7 @@ public class Interfaz extends Frame {
         frame.add(menuPanel, BorderLayout.NORTH);
 
         Panel panel = new Panel();
-        panel.setLayout(new GridLayout(4, 2, 10, 10));
+        panel.setLayout(new GridLayout(5, 2, 12, 12));
 
         Label labelBDCB = new Label("Base de datos:");
         Label labelTablaCB = new Label("Tabla:");
@@ -176,7 +185,7 @@ public class Interfaz extends Frame {
         frame.add(menuPanel, BorderLayout.NORTH);
 
         Panel panel = new Panel();
-        panel.setLayout(new GridLayout(10, 2, 10, 10));
+        panel.setLayout(new GridLayout(11, 2, 10, 10));
 
         Label labelBDO = new Label("Base de datos:");
         Label labelTablaO = new Label("Tabla:");
@@ -199,6 +208,8 @@ public class Interfaz extends Frame {
         Button botonDarDeAlta = new Button("Dar de alta");
         Button botonDarDeBaja = new Button("Dar de baja");
         Button botonModificarAlumno = new Button("Modificar alumno");
+        Button botonSeleccionarRandom=new Button("Seleccionar alumno aleatorio");
+        Button botonResetearIntervenciones=new Button("Resetear intervenciones");
 
         botonAlumnoMasParticipaciones.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -235,31 +246,63 @@ public class Interfaz extends Frame {
 
         botonUltimoAlumnoParticipante.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mostrarMensaje("Último alumno en participar");
+                String stringCampoTabla=campoTablaO.getText();
+                String stringCampoBDO=campoBDO.getText();
+                mostrarMensaje("Último alumno en participar: "+alumnoUltimo(stringCampoBDO,stringCampoTabla));
             }
         });
 
         botonMostrarInformacionAlumno.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mostrarMensaje("Mostrar información de un alumno");
+                String stringCampoAlumno=campoAlumno.getText();
+                String stringCampoTabla=campoTablaO.getText();
+                String stringCampoBDO=campoBDO.getText();
+                mostrarMensaje("Mostrar información de un alumno: "+alumnoInfo(stringCampoBDO,stringCampoTabla,stringCampoAlumno));
             }
         });
 
         botonDarDeAlta.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mostrarMensaje("Dar de alta");
+
+                String stringCampoAlumno=campoAlumno.getText();
+                String stringCampoTabla=campoTablaO.getText();
+                String stringCampoBDO=campoBDO.getText();
+                mostrarMensaje(alumnoDarAlta(stringCampoBDO,stringCampoTabla,stringCampoAlumno));
             }
         });
 
         botonDarDeBaja.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mostrarMensaje("Dar de baja");
+                String stringCampoAlumno=campoAlumno.getText();
+                String stringCampoTabla=campoTablaO.getText();
+                String stringCampoBDO=campoBDO.getText();
+                mostrarMensaje(alumnoDarBaja(stringCampoBDO,stringCampoTabla,stringCampoAlumno));
             }
         });
 
         botonModificarAlumno.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mostrarMensaje("Modificar alumno");
+                //String stringCampoAlumno=campoAlumno.getText();
+                //String stringCampoTabla=campoTablaO.getText();
+                //String stringCampoBDO=campoBDO.getText();
+                //String intTervenciones=campoIntervenciones.getText();
+                //mostrarMensaje("Modificar alumno"+alumnoModificar(stringCampoBDO,stringCampoTabla,stringCampoAlumno));
+            }
+        });
+        botonSeleccionarRandom.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String stringCampoTabla=campoTablaO.getText();
+                String stringCampoBDO=campoBDO.getText();
+                mostrarMensaje(seleccionarAlumnoAleatorio(stringCampoBDO,stringCampoTabla));
+            }
+        });
+        botonResetearIntervenciones.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String stringCampoTabla=campoTablaO.getText();
+                String stringCampoBDO=campoBDO.getText();
+                mostrarMensaje(reiniciarIntervenciones(stringCampoBDO,stringCampoTabla));
             }
         });
 
@@ -282,6 +325,8 @@ public class Interfaz extends Frame {
         panel.add(botonDarDeAlta);
         panel.add(botonDarDeBaja);
         panel.add(botonModificarAlumno);
+        panel.add(botonSeleccionarRandom);
+        panel.add(botonResetearIntervenciones);
 
         frame.add(panel);
 
