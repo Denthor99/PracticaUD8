@@ -1,4 +1,4 @@
-package org.ieslosremedios.daw1.prog.ut8y9;
+package practica89;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -6,9 +6,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import static org.ieslosremedios.daw1.prog.ut8y9.BaseDatos.*;
-import static org.ieslosremedios.daw1.prog.ut8y9.Operaciones.*;
-import static org.ieslosremedios.daw1.prog.ut8y9.ImportarExportar.*;
+import static practica89.BaseDatos.*;
+import static practica89.ImportarExportar.*;
+import static practica89.Operaciones.*;
 
 
 public class Interfaz extends Frame {
@@ -35,6 +35,43 @@ public class Interfaz extends Frame {
                 dispose();
             }
         });
+
+        // Crear botones del menú principal
+        MenuBar menuBar = new MenuBar();
+        setMenuBar(menuBar);
+
+        // Crear Menú principal
+        Menu menuPrincipal = new Menu("Opciones");
+        menuBar.add(menuPrincipal);
+
+        // Crear elementos del Menú principal
+        MenuItem itemCrearBorrar = new MenuItem("Crear/Borrar Base de Datos");
+        MenuItem itemOperaciones = new MenuItem("Operaciones Base de Datos");
+        MenuItem itemImportarExportar = new MenuItem("Importar/Exportar Datos");
+
+        // Configurar ActionListener para cada botón
+        itemCrearBorrar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarCrearBorrarFrame();
+            }
+        });
+
+        itemOperaciones.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarOperacionesFrame();
+            }
+        });
+
+        itemImportarExportar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                mostrarImportarExportarFrame();
+            }
+        });
+
+        // Crea panel para los botones del menú
+        menuPrincipal.add(itemCrearBorrar);
+        menuPrincipal.add(itemOperaciones);
+        menuPrincipal.add(itemImportarExportar);
 
         // Crear botones del menú principal
         Button botonCrearBorrar = new Button("Crear/Borrar Base de Datos");
@@ -73,15 +110,6 @@ public class Interfaz extends Frame {
         crearBorrarFrame = crearBorrar();
         operacionesFrame = operaciones();
         importarExportarFrame = importarExportar();
-
-        // Con esto cerramos el menú principal (paramos la ejecución)
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                dispose();
-                System.exit(0); // Si no se cierra, usamos la fuerza bruta
-            }
-        });
     }
 
 
@@ -96,14 +124,14 @@ public class Interfaz extends Frame {
             }
         });
 
-        // Crear el componente menú
+        // Crear el panel menú
         Panel menuPanel = opciones();
 
         // Agregar el componente menú al frame
         frame.add(menuPanel, BorderLayout.NORTH);
 
         Panel panel = new Panel();
-        panel.setLayout(new GridLayout(5, 2, 12, 12));
+        panel.setLayout(new GridLayout(4, 2, 10, 10));
 
         Label labelBDCB = new Label("Base de datos:");
         Label labelTablaCB = new Label("Tabla:");
@@ -185,31 +213,33 @@ public class Interfaz extends Frame {
         frame.add(menuPanel, BorderLayout.NORTH);
 
         Panel panel = new Panel();
-        panel.setLayout(new GridLayout(11, 2, 10, 10));
+        panel.setLayout(new GridLayout(12, 2, 10, 10));
 
         Label labelBDO = new Label("Base de datos:");
         Label labelTablaO = new Label("Tabla:");
         Label labelAlumno = new Label("Alumno:");
         Label labelIntervenciones = new Label("Intervenciones:");
         Label labelUltimaIntervencion = new Label("Última Intervención:");
+        Label labelNuevoNombre = new Label("Nuevo Nombre:");
 
         TextField campoBDO = new TextField();
         TextField campoTablaO = new TextField();
         TextField campoAlumno = new TextField();
         TextField campoIntervenciones = new TextField();
-        TextField campoFecha = new TextField();
+        TextField campoUltimaIntervencion = new TextField();
+        TextField campoNuevoNombre = new TextField();
 
         Button botonAlumnoMasParticipaciones = new Button("Alumno con más participaciones");
         Button botonAlumnoMenosParticipaciones = new Button("Alumno con menos participaciones");
         Button botonAlumnosPorDebajoMedia = new Button("Alumnos por debajo de la media");
         Button botonAlumnosPorCantidadIntervenciones = new Button("Alumnos por cantidad de intervenciones");
         Button botonUltimoAlumnoParticipante = new Button("Último alumno en participar");
+        Button botonSeleccionarAlumno=new Button("Seleccionar alumno aleatorio");
         Button botonMostrarInformacionAlumno = new Button("Mostrar información de un alumno");
+        Button botonResetearIntervenciones=new Button("Resetear intervenciones");
         Button botonDarDeAlta = new Button("Dar de alta");
         Button botonDarDeBaja = new Button("Dar de baja");
         Button botonModificarAlumno = new Button("Modificar alumno");
-        Button botonSeleccionarRandom=new Button("Seleccionar alumno aleatorio");
-        Button botonResetearIntervenciones=new Button("Resetear intervenciones");
 
         botonAlumnoMasParticipaciones.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -246,63 +276,64 @@ public class Interfaz extends Frame {
 
         botonUltimoAlumnoParticipante.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String stringCampoTabla=campoTablaO.getText();
-                String stringCampoBDO=campoBDO.getText();
-                mostrarMensaje("Último alumno en participar: "+alumnoUltimo(stringCampoBDO,stringCampoTabla));
+                String stringCampoBDO = campoBDO.getText();
+                String stringCampoTabla = campoTablaO.getText();
+                mostrarMensaje("Último alumno en participar: " + alumnoUltimo(stringCampoBDO, stringCampoTabla));
+            }
+        });
+
+        botonSeleccionarAlumno.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String stringCampoBDO = campoBDO.getText();
+                String stringCampoTabla = campoTablaO.getText();
+                mostrarMensaje(seleccionarAlumnoAleatorio(stringCampoBDO, stringCampoTabla));
             }
         });
 
         botonMostrarInformacionAlumno.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String stringCampoAlumno=campoAlumno.getText();
-                String stringCampoTabla=campoTablaO.getText();
-                String stringCampoBDO=campoBDO.getText();
-                mostrarMensaje("Mostrar información de un alumno: "+alumnoInfo(stringCampoBDO,stringCampoTabla,stringCampoAlumno));
+                String stringCampoBDO = campoBDO.getText();
+                String stringCampoTabla = campoTablaO.getText();
+                String stringCampoAlumno = campoAlumno.getText();
+                mostrarMensaje("Información del alumno:" + alumnoInfo(stringCampoBDO, stringCampoTabla, stringCampoAlumno));
+            }
+        });
+
+        botonResetearIntervenciones.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String stringCampoBDO = campoBDO.getText();
+                String stringCampoTabla = campoTablaO.getText();
+                mostrarMensaje(resetearIntervenciones(stringCampoBDO, stringCampoTabla));
             }
         });
 
         botonDarDeAlta.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
-                String stringCampoAlumno=campoAlumno.getText();
-                String stringCampoTabla=campoTablaO.getText();
-                String stringCampoBDO=campoBDO.getText();
-                mostrarMensaje(alumnoDarAlta(stringCampoBDO,stringCampoTabla,stringCampoAlumno));
+                String stringCampoBDO = campoBDO.getText();
+                String stringCampoTabla = campoTablaO.getText();
+                String stringCampoAlumno = campoAlumno.getText();
+                alumnoDarAlta(stringCampoBDO, stringCampoTabla, stringCampoAlumno);
+                mostrarMensaje(alumnoDarAlta(stringCampoBDO, stringCampoTabla, stringCampoAlumno));
             }
         });
 
         botonDarDeBaja.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String stringCampoAlumno=campoAlumno.getText();
-                String stringCampoTabla=campoTablaO.getText();
-                String stringCampoBDO=campoBDO.getText();
+                String stringCampoBDO = campoBDO.getText();
+                String stringCampoTabla = campoTablaO.getText();
+                String stringCampoAlumno = campoAlumno.getText();
                 mostrarMensaje(alumnoDarBaja(stringCampoBDO,stringCampoTabla,stringCampoAlumno));
             }
         });
 
         botonModificarAlumno.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //String stringCampoAlumno=campoAlumno.getText();
-                //String stringCampoTabla=campoTablaO.getText();
-                //String stringCampoBDO=campoBDO.getText();
-                //String intTervenciones=campoIntervenciones.getText();
-                //mostrarMensaje("Modificar alumno"+alumnoModificar(stringCampoBDO,stringCampoTabla,stringCampoAlumno));
-            }
-        });
-        botonSeleccionarRandom.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String stringCampoTabla=campoTablaO.getText();
-                String stringCampoBDO=campoBDO.getText();
-                mostrarMensaje(seleccionarAlumnoAleatorio(stringCampoBDO,stringCampoTabla));
-            }
-        });
-        botonResetearIntervenciones.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String stringCampoTabla=campoTablaO.getText();
-                String stringCampoBDO=campoBDO.getText();
-                mostrarMensaje(reiniciarIntervenciones(stringCampoBDO,stringCampoTabla));
+                String stringCampoBDO = campoBDO.getText();
+                String stringCampoTabla = campoTablaO.getText();
+                String stringCampoAlumno = campoAlumno.getText();
+                String stringIntervenciones = campoIntervenciones.getText();
+                String stringNuevoNombre = campoNuevoNombre.getText();
+                mostrarMensaje(alumnoModificar(stringCampoBDO, stringCampoTabla, stringCampoAlumno, stringIntervenciones, stringNuevoNombre).toString());
             }
         });
 
@@ -315,18 +346,20 @@ public class Interfaz extends Frame {
         panel.add(labelIntervenciones);
         panel.add(campoIntervenciones);
         panel.add(labelUltimaIntervencion);
-        panel.add(campoFecha);
+        panel.add(campoUltimaIntervencion);
+        panel.add(labelNuevoNombre);
+        panel.add(campoNuevoNombre);
         panel.add(botonAlumnoMasParticipaciones);
         panel.add(botonAlumnoMenosParticipaciones);
         panel.add(botonAlumnosPorDebajoMedia);
         panel.add(botonAlumnosPorCantidadIntervenciones);
         panel.add(botonUltimoAlumnoParticipante);
+        panel.add(botonSeleccionarAlumno);
         panel.add(botonMostrarInformacionAlumno);
+        panel.add(botonResetearIntervenciones);
         panel.add(botonDarDeAlta);
         panel.add(botonDarDeBaja);
         panel.add(botonModificarAlumno);
-        panel.add(botonSeleccionarRandom);
-        panel.add(botonResetearIntervenciones);
 
         frame.add(panel);
 

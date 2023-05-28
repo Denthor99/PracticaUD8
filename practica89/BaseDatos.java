@@ -1,4 +1,4 @@
-package org.ieslosremedios.daw1.prog.ut8y9;
+package practica89;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -7,8 +7,8 @@ public class BaseDatos {
     private static final String DB_URL = "jdbc:mariadb://localhost:3306/";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "";
-/*
-    public static void main(String[] args) {
+
+    /* public static void main(String[] args) {
         System.out.println("Gestión Base de Datos");
         Scanner scanner = new Scanner(System.in);
         System.out.print("Ingrese c (crear) / b (borrar): ");
@@ -21,7 +21,7 @@ public class BaseDatos {
         } else {
             System.out.println("Entrada no válida");
         }
-    }
+    } */
 
      static void crearBD() {
         Scanner scanner = new Scanner(System.in);
@@ -37,7 +37,7 @@ public class BaseDatos {
             crearBaseDeDatos(nombreBD);
             crearTabla(nombreBD, nombreTabla);
     }
-*/
+
     static void borrarBD() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Ingrese el nombre de la base de datos: ");
