@@ -21,7 +21,7 @@
 - Funciones de importación/exportación de datos - Completado
 - Interfaz implementada con AWT - Completado
 - Uso de PostgreSQL (opcional) - Pendiente implementación
-- Presentación del proyecto - En proceso
+- Presentación del proyecto - Completado
 
 ## Uso de la aplicación
 Menú Principal:
